@@ -7,7 +7,7 @@ use \Resque\Resque;
 use \Resque\Redis;
 use \Resque\JobHandler;
 use \Resque\Stat;
-use \Resque\Job\JobInterface;
+use \Resque\Job\Job;
 use \Resque\Job\FactoryInterface;
 use \Test_Job_With_SetUp;
 use \Test_Job_With_TearDown;
@@ -66,15 +66,6 @@ class JobHandlerTest extends ResqueTestCase
 		}
 		$this->assertEquals('jobs', $job->queue);
 		$this->assertEquals('Test_Job', $job->payload['class']);
-	}
-
-	public function testObjectArgumentsCannotBePassedToJob()
-	{
-		$this->expectException('InvalidArgumentException');
-
-		$args = new stdClass();
-		$args->test = 'somevalue';
-		Resque::enqueue('jobs', 'Test_Job', $args);
 	}
 
 	public function testQueuedJobReturnsExactSamePassedInArguments()
@@ -168,10 +159,10 @@ class JobHandlerTest extends ResqueTestCase
 	{
 		$payload = array(
 			'class' => 'Test_Job_With_SetUp',
-			'args' => array(
+			'args' => array(array(
 				'somevar',
 				'somevar2',
-			),
+			)),
 		);
 		$job = new JobHandler('jobs', $payload);
 		$job->perform();
@@ -183,10 +174,10 @@ class JobHandlerTest extends ResqueTestCase
 	{
 		$payload = array(
 			'class' => 'Test_Job_With_TearDown',
-			'args' => array(
+			'args' => array(array(
 				'somevar',
 				'somevar2',
-			),
+			)),
 		);
 		$job = new JobHandler('jobs', $payload);
 		$job->perform();
@@ -410,7 +401,7 @@ class JobHandlerTest extends ResqueTestCase
 		$factory = new Some_Stub_Factory();
 		$job->setJobFactory($factory);
 		$instance = $job->getInstance();
-		$this->assertInstanceOf('Resque\Job\JobInterface', $instance);
+		$this->assertInstanceOf('Resque\Job\Job', $instance);
 	}
 
 	public function testDoNotUseFactoryToGetInstance()
@@ -422,11 +413,11 @@ class JobHandlerTest extends ResqueTestCase
 		$job = new JobHandler('jobs', $payload);
 		$factory = $this->getMockBuilder('Resque\Job\FactoryInterface')
 			->getMock();
-		$testJob = $this->getMockBuilder('Resque\Job\JobInterface')
+		$testJob = $this->getMockBuilder('Resque\Job\Job')
 			->getMock();
 		$factory->expects(self::never())->method('create')->will(self::returnValue($testJob));
 		$instance = $job->getInstance();
-		$this->assertInstanceOf('Resque\Job\JobInterface', $instance);
+		$this->assertInstanceOf('Resque\Job\Job', $instance);
 	}
 
 	public function testJobStatusIsNullIfIdMissingFromPayload()
@@ -505,7 +496,7 @@ class JobHandlerTest extends ResqueTestCase
 	}
 }
 
-class Some_Job_Class implements JobInterface
+class Some_Job_Class extends Job
 {
 
 	/**
@@ -524,9 +515,9 @@ class Some_Stub_Factory implements FactoryInterface
 	 * @param $className
 	 * @param array $args
 	 * @param $queue
-	 * @return Resque\Job\JobInterface
+	 * @return Resque\Job\Job
 	 */
-	public function create($className, $args, $queue)
+	public function create($className, $args, $queue): Job
 	{
 		return new Some_Job_Class();
 	}
