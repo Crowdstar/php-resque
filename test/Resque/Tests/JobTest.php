@@ -436,7 +436,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 	}
 }
 
-class Some_Job_Class implements Resque_JobInterface
+class Some_Job_Class extends Resque_AbstractJob
 {
 
 	/**
