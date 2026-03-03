@@ -2,10 +2,10 @@ name: PHP Tests
 on: [push, pull_request]
 
 jobs:
-  phpunit:
+  phpunit-and-phplint:
     runs-on: ubuntu-latest
     continue-on-error: true
-    name: "PHP-${{ matrix.php-versions }}: PHPUnit"
+    name: "PHP-${{ matrix.php-versions }}: PHPUnit/phplint"
     strategy:
       matrix:
         php-versions: ['8.1', '8.2', '8.3', '8.4', '8.5']
@@ -17,7 +17,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          tools: phpunit:10
+          tools: phpunit:10, phplint
           extensions: redis
 
       - name: Setup problem matchers for PHP
@@ -25,6 +25,9 @@ jobs:
 
       - name: Install dependencies
         run: composer install
+
+      - name: Run phplint
+        run: phplint --no-cache lib vendor
 
       - name: Install redis
         run: sudo apt-get install -y redis-server
