@@ -37,7 +37,7 @@ jobs:
         run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
       - name: Run PHPStan
-        run: phpstan analyse lib --memory-limit=-1 -l1
+        run: phpstan analyse --memory-limit=-1
 
       - name: Install redis
         run: sudo apt-get install -y redis-server
