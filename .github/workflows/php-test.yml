@@ -2,13 +2,14 @@ name: PHP Tests
 on: [push, pull_request]
 
 jobs:
-  phpunit-and-phplint:
+  tests:
     runs-on: ubuntu-latest
     continue-on-error: true
-    name: "PHP-${{ matrix.php-versions }}: PHPUnit/phplint"
+    name: "PHP-${{ matrix.php-versions }}/PsrLog-${{ matrix.psr-log }}: tests"
     strategy:
       matrix:
         php-versions: ['8.1', '8.2', '8.3', '8.4', '8.5']
+        psr-log: ['~1.0',  '~2.0',  '~3.0']
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -17,17 +18,26 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          tools: phpunit:10, phplint
+          tools: phplint, phpstan, phpunit:10
           extensions: redis
 
-      - name: Setup problem matchers for PHP
-        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-
       - name: Install dependencies
-        run: composer install
+        run: composer install -n
+
+      - name: Update Composer package psr/log
+        run: composer update psr/log:${{ matrix.psr-log }}
+
+      - name: Setup problem matchers for phplint
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
 
       - name: Run phplint
         run: phplint --no-cache lib vendor
+
+      - name: Setup problem matchers for PHPStan
+        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+      - name: Run PHPStan
+        run: phpstan analyse lib --memory-limit=-1 -l1
 
       - name: Install redis
         run: sudo apt-get install -y redis-server
@@ -58,26 +68,3 @@ jobs:
 
       - name: Run PHPCS
         run: phpcs -q --report=checkstyle lib | cs2pr
-
-  phpstan:
-    runs-on: ubuntu-latest
-    continue-on-error: false
-    name: "PHPStan"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup PHPStan
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.4'
-          tools: phpstan
-
-      - name: Setup problem matchers for PHP
-        run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-
-      - name: Install dependencies
-        run: composer install
-
-      - name: Run PHPStan
-        run: phpstan analyse lib --memory-limit=-1 -l1
