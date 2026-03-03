@@ -30,7 +30,7 @@ class Resque_Tests_JobTest extends Resque_Tests_TestCase
 	{
 		$this->expectException(Resque_RedisException::class);
 		$mockCredis = $this->getMockBuilder('Credis_Client')
-			->setMethods(['connect', '__call'])
+			->onlyMethods(['connect', '__call'])
 			->getMock();
 		$mockCredis->expects($this->any())->method('__call')
 			->will($this->throwException(new CredisException('failure')));

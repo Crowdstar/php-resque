@@ -12,7 +12,7 @@ class Resque_Tests_RedisTest extends Resque_Tests_TestCase
 	{
 		$this->expectException(Resque_RedisException::class);
 		$mockCredis = $this->getMockBuilder('Credis_Client')
-			->setMethods(['connect', '__call'])
+			->onlyMethods(['connect', '__call'])
 			->getMock();
 		$mockCredis->expects($this->any())->method('__call')
 			->will($this->throwException(new CredisException('failure')));
@@ -28,7 +28,7 @@ class Resque_Tests_RedisTest extends Resque_Tests_TestCase
 	 *
 	 * @return array
 	 */
-	public function validDsnStringProvider()
+	public static function validDsnStringProvider()
 	{
 		return array(
 			// Input , Expected output
@@ -165,7 +165,7 @@ class Resque_Tests_RedisTest extends Resque_Tests_TestCase
 	 * These DSN values should throw exceptions
 	 * @return array
 	 */
-	public function bogusDsnStringProvider()
+	public static function bogusDsnStringProvider()
 	{
 		return array(
 			array('http://foo.bar/'),

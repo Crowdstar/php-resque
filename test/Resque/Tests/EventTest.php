@@ -42,7 +42,7 @@ class Resque_Tests_EventTest extends Resque_Tests_TestCase
 		return $job;
 	}
 
-	public function eventCallbackProvider()
+	public static function eventCallbackProvider()
 	{
 		return array(
 			array('beforePerform', 'beforePerformEventCallback'),
@@ -60,17 +60,24 @@ class Resque_Tests_EventTest extends Resque_Tests_TestCase
 
 		$job = $this->getEventTestJob();
 
+		$calls = [];
 		$this->logger->expects($this->exactly(3))
 			->method('log')
-			->withConsecutive(
-				[ 'notice', '{job} has finished', [ 'job' => $job ] ],
-				[ 'debug', 'Registered signals', [] ],
-				[ 'info', 'Checking {queue} for jobs', [ 'queue' => 'jobs' ] ]
-			);
+			->willReturnCallback(function (...$args) use (&$calls): void {
+				$calls[] = $args;
+			});
 
 		$this->worker->perform($job);
 		$this->worker->work(0);
 
+		$this->assertSame(
+			[
+				[ 'notice', '{job} has finished', [ 'job' => $job ] ],
+				[ 'debug', 'Registered signals', [] ],
+				[ 'info', 'Checking {queue} for jobs', [ 'queue' => 'jobs' ] ]
+			],
+			$calls
+		);
 		$this->assertContains($callback, $this->callbacksHit, $event . ' callback (' . $callback .') was not called');
 	}
 
