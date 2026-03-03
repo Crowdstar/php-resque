@@ -1,3 +1,31 @@
+## v1.4.1 (2026-03-03)
+
+This release has **no functional changes** and remains fully backward-compatible with the official [v1.3.6] package.
+
+**Highlights**
+
+* Dropped support for **PHP 8.0 and earlier**
+* Added support for **PHP 8.1 through 8.5**
+* Expanded support for [psr/log] Composer package from `~1.0` to `~3.0`
+* fix: function `strftime()` is deprecated in PHP 8.1. Replace with `date()`. ([php-resque/issues#66])
+* Resolved additional PHP deprecations, including:
+  * `${var}` string interpolation
+  * Creation of dynamic properties
+* Upgraded PHPUnit from v5 to v10, with the test suite fully validated across all supported PHP versions
+
+## v1.4.0 (2026-03-02)
+
+This release is based on the official [v1.3.6] package and remains fully backward-compatible with [v1.3.6].
+
+This is the final release built from the latest commit on the official package’s main branch. Starting from v1.4.1+, new
+releases will incorporate code changes contributed by the Crowdstar team to ensure PHP forward compatibility. These
+updates introduce no functional changes.
+
+Major Changes:
+
+* Updated Worker behavior to ping Redis only when unpaused ([php-resque/issues#47])
+* Fixed incorrect Logger configuration ([php-resque/issues#58])
+
 ## 1.3 (2013-??-??) - Current Master
 
 **Note:** This release introduces backwards incompatible changes with all
@@ -122,3 +150,9 @@ Redisent to Credis), and will drop compatibility with PHP 5.2.
 ## 1.0 (2010-04-18)
 
 -   Initial release
+
+[v1.3.6]: https://github.com/resque/php-resque/releases/tag/v1.3.6
+[php-resque/issues#47]: https://github.com/resque/php-resque/pull/47
+[php-resque/issues#58]: https://github.com/resque/php-resque/pull/58
+[php-resque/issues#66]: https://github.com/resque/php-resque/pull/66
+[psr/log]: https://github.com/php-fig/log
