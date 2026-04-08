@@ -6,6 +6,8 @@ This release has **no functional changes** and remains fully backward-compatible
 
 * Dropped support for **PHP 8.0 and earlier**
 * Added support for **PHP 8.1 through 8.5**
+  * Added new class `Resque_AbstractJob` to address PHP 8.2+ deprecations and ensure forward compatibility. This class
+    is conceptually aligned with `Resque\JobHandler\Job` in the official package’s `develop` branch.
 * Expanded support for [psr/log] Composer package from `~1.0` to `~3.0`
 * fix: function `strftime()` is deprecated in PHP 8.1. Replace with `date()`. ([php-resque/issues#66])
 * Resolved additional PHP deprecations, including:
